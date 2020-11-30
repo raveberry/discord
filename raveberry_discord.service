@@ -1,0 +1,13 @@
+[Unit]
+Description=Raveberry Discord bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/discord/
+ExecStart=/home/pi/discord/.venv/bin/python /home/pi/discord/raveberry.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
