@@ -125,7 +125,7 @@ async def queue(ctx):
             description=message,
         )
         embed.set_thumbnail(
-            url="https://raw.githubusercontent.com/raveberry/raveberry/master/static/graphics/raveberry_normal.png"
+            url="https://raw.githubusercontent.com/raveberry/raveberry/master/core/lights/circle/raveberry.png"
         )
         await channel.send(embed=embed)
 
