@@ -21,7 +21,7 @@ Since your Raveberry instance is probably not publicly available, I can not prov
 
 * Go to https://discord.com/developers/applications
 * Create Application "Raveberry"
-* (Optional: set app icon to [this image](https://github.com/raveberry/raveberry/blob/master/static/graphics/raveberry_square.png))
+* (Optional: set app icon to [this image](https://raw.githubusercontent.com/raveberry/raveberry/master/core/lights/circle/raveberry.png))
 
 
 * Go to Bot
