@@ -1,4 +1,5 @@
 import os
+import sys
 import discord
 import discord.ext.commands as commands
 import configparser
@@ -38,7 +39,7 @@ class Raveberry(commands.Bot):
             f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/state"
         )
         self.post_url = (
-            f"http://{raveberry_hostname}:{raveberry_port}/api/musiq/post_song/"
+            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/request-music/"
         )
         self.vote_up_url = (
             f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-up/"
@@ -47,6 +48,15 @@ class Raveberry(commands.Bot):
             f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-down/"
         )
         self.stream_url = f"http://{stream_username}:{stream_password}@{stream_hostname}:{stream_port}/stream"
+
+        try:
+            state = requests.get(self.state_url).json()
+        except requests.exceptions.ConnectionError:
+            print(
+                "Raveberry unreachable. Make sure it is running and check your config."
+            )
+            sys.exit(0)
+        self.platform = state["defaultPlatform"]
 
     async def on_ready(self):
         print(f"{self.user} has connected to Discord!")
@@ -143,8 +153,18 @@ async def play(ctx, *, query):
     channel = ctx.channel
     author_id = ctx.author.id
     async with channel.typing():
-        r = requests.post(self.post_url, data={"query": query})
+        r = requests.post(
+            self.post_url,
+            data={"query": query, "playlist": False, "platform": self.platform},
+        )
+
         if r.status_code == 200:
+            # Songs start with 1 vote, add to dict so users can't upvote a second time
+            key = r.json()["key"]
+            entry = (author_id, key)
+            if entry not in cast_votes:
+                cast_votes[entry] = 0
+            cast_votes[entry] += 1
             await ctx.message.add_reaction("👌")
         else:
             await ctx.message.add_reaction("⚠")
