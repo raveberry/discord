@@ -246,6 +246,9 @@ async def leave(ctx):
 async def refresh(ctx):
     self = ctx.bot
     voice = discord.utils.get(self.voice_clients, guild=ctx.guild)
+    if voice is None:
+        await ctx.message.add_reaction("⚠")
+        await ctx.channel.send("Not in a voice chat. Use 'join' first.")
     path = self.stream_url
     voice.stop()
     voice.play(discord.FFmpegOpusAudio(path))
