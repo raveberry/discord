@@ -41,10 +41,10 @@ class Raveberry(commands.Bot):
             f"http://{raveberry_hostname}:{raveberry_port}/api/musiq/post_song/"
         )
         self.vote_up_url = (
-            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote_up/"
+            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-up/"
         )
         self.vote_down_url = (
-            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote_down/"
+            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-down/"
         )
         self.stream_url = f"http://{stream_username}:{stream_password}@{stream_hostname}:{stream_port}/stream"
 
@@ -53,23 +53,24 @@ class Raveberry(commands.Bot):
 
     def identify_song(self, query):
         state = requests.get(self.state_url).json()
+        state = state["musiq"]
 
         try:
             index = int(query)
             if index == 0:
                 try:
-                    key = state["current_song"]["queue_key"]
+                    key = state["currentSong"]["queueKey"]
                 except TypeError:
                     raise SongDoesNotExistError
             else:
                 try:
-                    key = state["song_queue"][index - 1]["id"]
+                    key = state["songQueue"][index - 1]["id"]
                 except IndexError:
                     raise SongDoesNotExistError
         except ValueError:
-            if query.lower() in displayname(state["current_song"]).lower():
-                return state["current_song"]["queue_key"]
-            for song in state["song_queue"]:
+            if query.lower() in displayname(state["currentSong"]).lower():
+                return state["currentSong"]["queueKey"]
+            for song in state["songQueue"]:
                 if query.lower() in displayname(song).lower():
                     key = song["id"]
                     break
@@ -105,9 +106,10 @@ async def queue(ctx):
     channel = ctx.channel
     async with channel.typing():
         state = requests.get(self.state_url).json()
+        state = state["musiq"]
         queue = []
-        current_song = state["current_song"]
-        song_queue = state["song_queue"]
+        current_song = state["currentSong"]
+        song_queue = state["songQueue"]
 
         if current_song is None and not song_queue:
             message = "Currently empty :("
