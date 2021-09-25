@@ -112,8 +112,13 @@ async def queue(ctx):
         if current_song is None and not song_queue:
             message = "Currently empty :("
         else:
-            message = f"**0. ({current_song['votes']:+})** {displayname(current_song)}"
-            for i, song in enumerate(state["song_queue"]):
+            if current_song is None:
+                message = f"**0. (-)** _Empty_"
+            else:
+                message = (
+                    f"**0. ({current_song['votes']:+})** {displayname(current_song)}"
+                )
+            for i, song in enumerate(state["songQueue"]):
                 queue.append(f"**{i+1}. ({song['votes']:+})** {displayname(song)}")
             if queue:
                 message += "\n\n"
