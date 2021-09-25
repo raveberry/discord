@@ -170,11 +170,10 @@ async def vote_up(ctx, *, query):
         if cast_votes[entry] >= 1:
             await ctx.message.add_reaction("✋")
             return
-        else:
-            cast_votes[entry] += 1
 
         r = requests.post(self.vote_up_url, data={"key": key})
         if r.status_code == 200:
+            cast_votes[entry] += 1
             await ctx.message.add_reaction("👌")
         else:
             await ctx.message.add_reaction("⚠")
@@ -200,11 +199,10 @@ async def vote_down(ctx, *, query):
         if cast_votes[entry] <= -1:
             await ctx.message.add_reaction("✋")
             return
-        else:
-            cast_votes[entry] -= 1
 
         r = requests.post(self.vote_down_url, data={"key": key})
         if r.status_code == 200:
+            cast_votes[entry] -= 1
             await ctx.message.add_reaction("👌")
         else:
             await ctx.message.add_reaction("⚠")
