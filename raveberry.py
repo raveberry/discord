@@ -41,12 +41,7 @@ class Raveberry(commands.Bot):
         self.post_url = (
             f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/request-music/"
         )
-        self.vote_up_url = (
-            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-up/"
-        )
-        self.vote_down_url = (
-            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote-down/"
-        )
+        self.vote_url = f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote/"
         self.stream_url = f"http://{stream_username}:{stream_password}@{stream_hostname}:{stream_port}/stream"
 
         try:
@@ -171,8 +166,7 @@ async def play(ctx, *, query):
             await channel.send(r.text)
 
 
-@raveberry.command(aliases=["voteup", "up", "+"])
-async def vote_up(ctx, *, query):
+async def vote(ctx, query, amount):
     self = ctx.bot
     channel = ctx.channel
     author_id = ctx.author.id
@@ -187,46 +181,28 @@ async def vote_up(ctx, *, query):
         entry = (author_id, key)
         if entry not in cast_votes:
             cast_votes[entry] = 0
-        if cast_votes[entry] >= 1:
+        new_vote = cast_votes[entry] + amount
+        if new_vote < -1 or new_vote > 1:
             await ctx.message.add_reaction("✋")
             return
 
-        r = requests.post(self.vote_up_url, data={"key": key})
+        r = requests.post(self.vote_url, data={"key": key, "amount": amount})
         if r.status_code == 200:
-            cast_votes[entry] += 1
+            cast_votes[entry] = new_vote
             await ctx.message.add_reaction("👌")
         else:
             await ctx.message.add_reaction("⚠")
             await channel.send(r.text)
+
+
+@raveberry.command(aliases=["voteup", "up", "+"])
+async def vote_up(ctx, *, query):
+    await vote(ctx, query, 1)
 
 
 @raveberry.command(aliases=["votedown", "down", "-"])
 async def vote_down(ctx, *, query):
-    self = ctx.bot
-    channel = ctx.channel
-    author_id = ctx.author.id
-    async with channel.typing():
-        try:
-            key = self.identify_song(query)
-        except SongDoesNotExistError:
-            await ctx.message.add_reaction("⚠")
-            await channel.send(f"> {ctx.message.content}\nSong does not exist")
-            return
-
-        entry = (author_id, key)
-        if entry not in cast_votes:
-            cast_votes[entry] = 0
-        if cast_votes[entry] <= -1:
-            await ctx.message.add_reaction("✋")
-            return
-
-        r = requests.post(self.vote_down_url, data={"key": key})
-        if r.status_code == 200:
-            cast_votes[entry] -= 1
-            await ctx.message.add_reaction("👌")
-        else:
-            await ctx.message.add_reaction("⚠")
-            await channel.send(r.text)
+    await vote(ctx, query, -1)
 
 
 @raveberry.command()

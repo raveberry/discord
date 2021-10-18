@@ -118,6 +118,8 @@ This should be enough to have an enjoyable experience. All further configuration
 ## Troubleshooting
 If Raveberry has no songs to play, the bot will play silence. However, it has problems catching up when songs are playing again. It might take 1-2 minutes for it to start playing the next song. Use `!refresh` to restart the audio stream so you don't have to wait.
 
+Make sure that IP vote checking is disabled in Raveberry. Since the discord bot connects from a single IP, it would not be able to cast multiple votes.
+
 Make sure Raveberry is running at that it can play music. Also make sure that streaming works by opening the stream in your browser.
 Check the logs of the related services:
 ```
