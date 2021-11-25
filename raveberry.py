@@ -41,6 +41,9 @@ class Raveberry(commands.Bot):
         self.post_url = (
             f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/request-music/"
         )
+        self.control_url = (
+            f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/"
+        )
         self.vote_url = f"http://{raveberry_hostname}:{raveberry_port}/ajax/musiq/vote/"
         self.stream_url = f"http://{stream_username}:{stream_password}@{stream_hostname}:{stream_port}/stream"
 
@@ -172,11 +175,45 @@ async def play(ctx, *, query):
 async def pause(ctx)
     self = ctx.bot
     channel = ctx.channel
+    author_id = ctx.author.id
+    async with channel.typing():
+        r = requests.post(
+            f"{self.control_url}pause/",
+        )
+        if r.status_code == 200:
+            await ctx.message.add_reaction("👌")
+        else:
+            await ctx.message.add_reaction("⚠")
+
+@raveberry.command(alises=["res"])
+async def resume(ctx)
+    self = ctx.bot
+    channel = ctx.channel
+    author_id = ctx.author.id
+    async with channel.typing():
+        r = requests.post(
+            f"{self.control_url}play/",
+        )
+        if r.status_code == 200:
+            await ctx.message.add_reaction("👌")
+        else:
+            await ctx.message.add_reaction("⚠")
+
 
 @raveberry.command(aliases=["next", "fs"])
 async def skip(ctx)
     self = ctx.bot
     channel = ctx.channel
+    author_id = ctx.author.id
+    async with channel.typing():
+        r = requests.post(
+            f"{self.control_url}skip/",
+        )
+        if r.status_code == 200:
+            await ctx.message.add_reaction("👌")
+        else:
+            await ctx.message.add_reaction("⚠")
+
 
 async def vote(ctx, query, amount):
     self = ctx.bot
